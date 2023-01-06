@@ -1,5 +1,4 @@
 <?php
-
 namespace MethodArgument;
 
 use MethodArgument\Library\ParamterValue;
