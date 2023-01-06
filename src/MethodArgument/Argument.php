@@ -66,7 +66,7 @@ class Argument
     *   @param array $rule  [
     *                           "required",
     *                           "max" => 12 //max只支持一个参数
-    *                           "number" => [10,12]  //number验证规则支持两个参数
+    *                           "range" => [10,12]  //number验证规则支持两个参数
     *                           "customer" => […… args]  //自定义验证规则的参数不因定
     *                       ]
     * @规则C
@@ -155,7 +155,7 @@ class Argument
             if( $this->hasArgumentFromMethod($key) ){
                 $argumentValue = $this->getArgumentFromMethod($key, $argumentValue);
             }
-            $ParamterValue = new ParamterValue($argumentValue);
+            $ParamterValue = new ParamterValue($argumentValue, $this);
             //设置验证规则
             $ParamterValue->setValidation( $this->parseVerifyFields($key) );
             //设置默认值

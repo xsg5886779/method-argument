@@ -2,6 +2,10 @@
 
 namespace MethodArgument\Library;
 
+
+/**
+* 参数值实例对象
+*/
 Class ParamterValue
 {
     private $DefaultValue = null;
@@ -45,7 +49,12 @@ Class ParamterValue
             //'argument' 
             foreach($this->VerifyFields as $rule)
             {
-                
+                $validate = new Validate($this, $rule);
+                $verify = $validate->run();
+                if( $verify !== true)
+                {
+                    $error->addError($verify);
+                }
             }
         }
         if( $error->Count() > 0 ){
