@@ -1,0 +1,21 @@
+{
+    "name": "method-args/argument",
+    "description": "method argument command",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "xsg5886779",
+            "email": "5886779@qq.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "MethodArgument\\": "src/MethodArgument"
+        }
+    }
+}
