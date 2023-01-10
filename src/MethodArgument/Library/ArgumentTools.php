@@ -63,7 +63,6 @@ Trait ArgumentTools
     private function parseStringVerify($string)
     {
         $get_data = explode('|', $string);
-        
         $validation = [];
         foreach($get_data as $_validat)
         {
@@ -109,6 +108,7 @@ Trait ArgumentTools
         $args       = explode(":", $validation);
         $formula    = array_shift($args);
         $customer   = false;
+        //如果不在系统函数中
         if( !in_array($formula, $this->systemVerifyHandle) )
         {
             if( $this->hasCustomerVerify($formula) == false ){

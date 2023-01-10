@@ -34,9 +34,10 @@ Class Validate
             return call_user_func_array([$this, strtolower($handle)], $args);
         }
         //内置验证方法
-        if( class_exists( ucfirst($handle) ) )
+        if( class_exists( '\\MethodArgument\\Library\\Validate\\'.ucfirst($handle) ) )
         {
-            $verObject  = new $handle($this->Value->getValue(), $args);
+            $ValidateClass = '\\MethodArgument\\Library\\Validate\\'.ucfirst($handle);
+            $verObject  = new $ValidateClass($this->Value->getValue(), $args);
             return $verObject->verify();
         }
         //执行自定义函数验证规则
