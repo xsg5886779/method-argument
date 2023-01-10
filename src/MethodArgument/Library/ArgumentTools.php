@@ -5,9 +5,7 @@ namespace MethodArgument\Library;
 use MethodArgument\Library\ParamterValue;
 
 Trait ArgumentTools
-{
-    protected $systemVerifyHandle = ["required", "matches", "email", "number", "range", "max","maxlen","minlen","min"];
-    
+{    
     /**
     * 获取一个参数的默认值
     */
@@ -20,9 +18,8 @@ Trait ArgumentTools
     *
     * @example 
     */
-    public function parseVerifyFields($key)
+    public function parseVerifyRule($validation)
     {
-        $validation = $this->verifyFields[$key] ?? null;
         //如果是null则不存在
         if( $validation == null ){
             return null;
@@ -79,13 +76,13 @@ Trait ArgumentTools
     */
     private function parseArrayVerify($validation)
     {
-        $validation = [];
+        $validadated = [];
         foreach($validation as $formula => $args)
         {
             //["required","max:10"]
             if( is_int($formula) && is_string($args) )
             {
-                $validation[] = $this->getVerifyStructureFromString($args);
+                $validadated[] = $this->getVerifyStructureFromString($args);
                 continue;
             }
             elseif( is_int($formula) ){
@@ -99,13 +96,13 @@ Trait ArgumentTools
                 }
                 $customer = true;
             }
-            $validation[] = [
+            $validadated[] = [
                 'handle'   => $formula,
                 'customer' => $customer,
                 'argument' => (array)$args
             ];
         }
-        return $validation;
+        return $validadated;
     }
     private function getVerifyStructureFromString($validation)
     {
