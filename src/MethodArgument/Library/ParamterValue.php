@@ -194,7 +194,28 @@ Class ParamterValue
     */
     public function getValue()
     {
-        return $this->ArgumentValue === null ? $this->DefaultValue : $this->ArgumentValue ;
+        $value = $this->ArgumentValue === null ? $this->DefaultValue : $this->ArgumentValue ;
+        //检查是否有可访问的查询修改器
+        $getValueRefactor = 'get'. $this->getRefactorName() .'Attribue';        
+        if( method_exists($this->Resource, $getValueRefactor) )
+        {
+            $args = [];
+            array_unshift($args, $value);
+            //
+            $value = call_user_func_array([
+                $this->Resource, $getValueRefactor
+            ], $args);
+        }
+        return $value;
+    }
+    /**
+    * 格式化参数，应对修改器
+    */
+    private function getRefactorName()
+    {
+        $str = str_replace('_', ' ', $this->ArgumentField);
+        $str = ucwords($str);
+        return str_replace(' ', '', $str);
     }
     
     public function __toString()
