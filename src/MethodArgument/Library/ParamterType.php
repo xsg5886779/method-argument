@@ -6,19 +6,20 @@ Class ParamterType
 {
     private $input = null;
     
-    private $types = [
-        'integer'   => 'int',
-        'string'    => 'string',
-        'double'    => 'double',
-        'object'    => 'object',
-        'array'     => 'array'
-        'Closure'   => 'function'
-        'NULL'      => 'null'
-    ];
+    private $types = null;
     
     public function __construct($input)
     {
         $this->input = $input;
+        $this->types = [
+            'integer'   => 'int',
+            'string'    => 'string',
+            'double'    => 'double',
+            'object'    => 'object',
+            'array'     => 'array',
+            'Closure'   => 'function',
+            'NULL'      => 'null',
+        ];
     }
     public function gettype()
     {
@@ -32,12 +33,48 @@ Class ParamterType
         return $this->types[$type] ?? 'null' ;
     }
     /**
+    * 是否为对象
+    */
+    public function isClass()
+    {
+        $type = $this->gettype();
+        if( $type == 'object' )
+        {
+            return true;
+        }
+        return false;
+    }
+    /**
     * 是否为数字
     */
     public function isNumber()
     {
         $type = $this->gettype();
         if( $type == 'int' || $type == 'double' )
+        {
+            return true;
+        }
+        return false;
+    }
+    /**
+    * 是否为字符串
+    */
+    public function isString()
+    {
+        $type = $this->gettype();
+        if( $type == 'string' )
+        {
+            return true;
+        }
+        return false;
+    }
+    /**
+    * 是否为NULL
+    */
+    public function isNull()
+    {
+        $type = $this->gettype();
+        if( $type == 'null' )
         {
             return true;
         }

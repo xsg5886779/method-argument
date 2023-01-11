@@ -16,6 +16,9 @@ class Argument
 {
     use ArgumentTools;
     
+    protected $systemVerifyHandle = ["required", "matches", "email", "number", "range", "max","maxlen","minlen","min"];
+    
+    private $verifyError = [];
     /**
     * 默认值设置
     */
@@ -30,12 +33,17 @@ class Argument
             foreach($key as $_key)
             {
                 if( is_string($_key) ){
-                    $this->mustFields[] = $_key;
+                    $this->setMust($_key);
                 }
             }
         }
         elseif( is_string($key) ){
-            $this->mustFields[] = $key;
+            $this->mustFields[] = $key;            
+            //更新已生成字段
+            if( isset($this->OriginalFields[$field]) )
+            {
+                $this->OriginalFields[$key]->setMust(true);
+            }
         }
     }
     
@@ -88,6 +96,36 @@ class Argument
             return ;
         }
         $this->verifyFields[$field] = $rule;
+        //更新已生成字段
+        if( isset($this->OriginalFields[$field]) )
+        {
+            $this->OriginalFields[$field]->setValidation($rule);
+        }
+    }
+    /**
+    * 自定义字段验证失败提示
+    * 
+    * 规则 [paramter => [rule => message] ]
+    * @example  ['user_id' => ['required' => 'user_id必填'] ]
+    */
+    protected $verifyErrorMessage = [];
+    /**
+    * 添加一个自定义错误提示
+    *
+    * @param string $ParamterAndRule  规则路径 'user_id.required' = user_id字段下的字段必填验证
+    * @param string $message
+    */
+    public function addVerifyError($ParamterAndRule, $message)
+    {
+        if( $ParamterAndRule && strpos($ParamterAndRule, '.') !== false && !empty($message))
+        {
+            list($paramterKey, $validateHandle) = explode('.', $ParamterAndRule);
+            if(!isset($this->verifyErrorMessage[$paramterKey]))
+            {
+                $this->verifyErrorMessage[$paramterKey] = [];
+            }
+            $this->verifyErrorMessage[$paramterKey][lcfirst($validateHandle)] = $message;
+        }
     }
     
     /**
@@ -116,24 +154,59 @@ class Argument
     }
     /**
     * 进行所有参数的校验
+    *
+    * @param array | null $customerErrorMessage 自定义错误信息 。 格式[ paramterKey.rule => message ]
+    * @return boolean false时，可以通过Argument::getError()获得错误信息
     */
-    public function verify()
+    public function verify($customerErrorMessage = null)
     {
-        $error = [];
-        foreach($this->fields as $key => $value)
+        if( !empty($customerErrorMessage) && is_array($customerErrorMessage) )
         {
-            $Paramter = $this->getArgument($key);
-            if($Paramter->verify() !== true)
+            foreach($customerErrorMessage as $paramter => $message)
             {
-                $error[$key] = $Paramter->getError();
-                //如果是非一次验证，则发现错误就退出
-                if(!$this->fullValidationMode)
-                {
-                    break;
-                }
+                $this->addVerifyError($paramter, $message);
             }
         }
+        $paramters = array_keys($this->fields);
+        $paramters = array_unique( array_merge($paramters, $this->mustFields) );
+        foreach($paramters as $key)
+        {
+            $verify = $this->verifyParamter( $key );
+            
+            //如果是非一次验证，则发现错误就退出
+            if(!$this->fullValidationMode && $verify !== true)
+            {
+                break;
+            }
+        }
+        return count($this->verifyError) == 0;
+    }
+    /**
+    * 按参数名进行验证
+    */
+    public function verifyParamter($paramter)
+    {
+        //获得自定义错误信息
+        $verifyMessage = $this->verifyError[$paramter] ?? null ;
+        //获得参数ParamterValue
+        $Paramter = $this->getArgument($paramter);
+        if(($error = $Paramter->verify($verifyMessage)) !== true)
+        {
+            $this->verifyError[$paramter] = $error;
+        }
         return $error;
+    }
+    /**
+    * 获得验证错误信息
+    */
+    public function getError()
+    {
+        $collection = [];
+        foreach($this->verifyError as $key => $error)
+        {
+            $collection[] = $error->getMessage();
+        }
+        return $collection;
     }
     /**
     * 添加一个参数
@@ -154,9 +227,23 @@ class Argument
             if( $this->hasArgumentFromMethod($key) ){
                 $argumentValue = $this->getArgumentFromMethod($key, $argumentValue);
             }
-            $ParamterValue = new ParamterValue($argumentValue, $this);
+            $ParamterValue = new ParamterValue($key, $argumentValue, $this);
+            $ParamterValue->setIsSet( isset($this->fields[$key]) );
+            
+            //必填项自动生成验证规则
+            if(is_array($this->mustFields)){
+                $ParamterValue->setIsMust( in_array($key, $this->mustFields) );
+            }
+            //设置自定义错误信息
+            $customerVerifyError = null;
+            if(isset($this->verifyErrorMessage[$key]))
+            {
+                $customerVerifyError = $this->verifyErrorMessage[$key];
+            }
             //设置验证规则
-            $ParamterValue->setValidation( $this->parseVerifyFields($key) );
+            if( isset($this->verifyFields[$key]) ){
+                $ParamterValue->setValidation( $this->verifyFields[$key], $customerVerifyError );
+            }
             //设置默认值
             $ParamterValue->setDefaultValue( $this->getDefaultValue($key) );
             //存储实例化
@@ -164,7 +251,7 @@ class Argument
         }
         
         
-        return return $this->OriginalFields[$key];
+        return $this->OriginalFields[$key];
     }
     
 }
