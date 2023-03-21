@@ -47,6 +47,7 @@ Class ParamterValue
     /**
     * @param mix $argumentValue     原始传处参数值
     * @param &\MethodArgument\Argument $argumentResource     原始传处参数值
+    * @return this
     */
     public function __construct($argumentField, $argumentValue, &$argumentResource)
     {
@@ -230,7 +231,7 @@ Class ParamterValue
         }
         if($this->type()->isArray())
         {
-            return json_encode($his->getValue());
+            return json_encode($this->getValue());
         }
         return (string)$this->getValue();
     }
@@ -259,7 +260,7 @@ Class ParamterValue
     public function __call($method, $args)
     {
         if( $this->isEmpty() == false && $this->type()->isClass() ){
-            if( property_exists($this->getValue(), $key) )
+            if( property_exists($this->getValue(), $method) )
             {
                 return call_user_func_array(
                     [$this->getValue(), $method],

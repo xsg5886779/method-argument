@@ -7,7 +7,12 @@ Class ParamterType
     private $input = null;
     
     private $types = null;
-    
+    /**
+     * Undocumented function
+     *
+     * @param [type] $input
+     * @return mixed
+     */
     public function __construct($input)
     {
         $this->input = $input;
