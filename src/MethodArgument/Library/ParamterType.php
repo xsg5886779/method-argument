@@ -8,9 +8,9 @@ Class ParamterType
     
     private $types = null;
     /**
-     * Undocumented function
+     * 创建一个参数对象
      *
-     * @param [type] $input
+     * @param mixed $input
      * @return mixed
      */
     public function __construct($input)

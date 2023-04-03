@@ -40,7 +40,7 @@ class Argument
         elseif( is_string($key) ){
             $this->mustFields[] = $key;            
             //更新已生成字段
-            if( isset($this->OriginalFields[$field]) )
+            if( isset($this->OriginalFields[$key]) )
             {
                 $this->OriginalFields[$key]->setMust(true);
             }

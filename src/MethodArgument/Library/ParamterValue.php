@@ -47,7 +47,6 @@ Class ParamterValue
     /**
     * @param mix $argumentValue     原始传处参数值
     * @param &\MethodArgument\Argument $argumentResource     原始传处参数值
-    * @return this
     */
     public function __construct($argumentField, $argumentValue, &$argumentResource)
     {
