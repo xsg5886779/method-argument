@@ -189,6 +189,10 @@ Class ParamterValue
         return empty($this->getValue());
     }
     
+    public function Get()
+    {
+        return $this->getValue();
+    }
     /**
     * 返回值
     */
@@ -252,7 +256,7 @@ Class ParamterValue
         if( $this->isEmpty() == false && $this->type()->isClass() ){
             if( property_exists($this->getValue(), $key) )
             {
-                return $this->getValue()->$key;
+                return new ParamterValue($key, $this->getValue()->$key, $this->Resource) ;
             }
         }
     }
