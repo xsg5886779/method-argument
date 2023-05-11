@@ -8,16 +8,16 @@ use MethodArgument\Library\Error;
 *
 * 生命周期：Argument::verify() 会将所有己填参数和配置生成ParamterValue实例存储到OriginalFields中
 *                              如果没有触发Argument::verify()，则在Argument::__get 时，实例ParamterValue存储到OriginalFields中
-*           
+*
 *           实例ParamterValue后，Argument::addFieldRule将不生效
-*           
+*
 */
 class Argument
 {
     use ArgumentTools;
-    
+
     protected $systemVerifyHandle = ["required", "matches", "email", "number", "range", "max","maxlen","minlen","min"];
-    
+
     private $verifyError = [];
     /**
     * 默认值设置
@@ -38,7 +38,7 @@ class Argument
             }
         }
         elseif( is_string($key) ){
-            $this->mustFields[] = $key;            
+            $this->mustFields[] = $key;
             //更新已生成字段
             if( isset($this->OriginalFields[$key]) )
             {
@@ -46,7 +46,7 @@ class Argument
             }
         }
     }
-    
+
     /**
     * 字段验证规则
     */
@@ -55,11 +55,11 @@ class Argument
     * 按字段设置验证规则（当$field 为数组的时候且$rule为空，则视为批量设置）
     *
     * @des 支持规则：
-    *            required：必填（不能为null,不能为空）, 
-    *            matches：正则表达式, 
-    *            email：邮件, 
-    *            number：数字, 
-    *            range：区间数字（仅数字类型）, 
+    *            required：必填（不能为null,不能为空）,
+    *            matches：正则表达式,
+    *            email：邮件,
+    *            number：数字,
+    *            range：区间数字（仅数字类型）,
     *            max：最大数字（仅数字类型）,
     *            min：最小数字（仅数字类型）,
     *            maxlen：最大字符长度（仅string）,
@@ -104,7 +104,7 @@ class Argument
     }
     /**
     * 自定义字段验证失败提示
-    * 
+    *
     * 规则 [paramter => [rule => message] ]
     * @example  ['user_id' => ['required' => 'user_id必填'] ]
     */
@@ -127,7 +127,7 @@ class Argument
             $this->verifyErrorMessage[$paramterKey][lcfirst($validateHandle)] = $message;
         }
     }
-    
+
     /**
     * 必填项验证模式（true=一次性验证所有必填项/false只要
     * @type Proterty
@@ -137,13 +137,13 @@ class Argument
     * 存储创建ParamterValue实例对象
     */
     private $OriginalFields = [];
-    
+
     /**
     * 存储所有参数值
     */
     private $fields = [];
-    
-    
+
+
     public function __get($key)
     {
         return $this->getArgument( $key );
@@ -172,7 +172,7 @@ class Argument
         foreach($paramters as $key)
         {
             $verify = $this->verifyParamter( $key );
-            
+
             //如果是非一次验证，则发现错误就退出
             if(!$this->fullValidationMode && $verify !== true)
             {
@@ -221,7 +221,7 @@ class Argument
     protected function getArgument($key)
     {
         $argumentValue = $this->fields[$key] ?? null;
-        
+
         if( !isset($this->OriginalFields[$key]) )
         {
             if( $this->hasArgumentFromMethod($key) ){
@@ -229,7 +229,7 @@ class Argument
             }
             $ParamterValue = new ParamterValue($key, $argumentValue, $this);
             $ParamterValue->setIsSet( isset($this->fields[$key]) );
-            
+
             //必填项自动生成验证规则
             if(is_array($this->mustFields)){
                 $ParamterValue->setIsMust( in_array($key, $this->mustFields) );
@@ -249,8 +249,8 @@ class Argument
             //存储实例化
             $this->OriginalFields[$key] = $ParamterValue;
         }
-        
-        
+
+
         return $this->OriginalFields[$key];
     }
     
