@@ -174,6 +174,7 @@ Class ParamterValue
     {
         return new ParamterType($this->getValue());
     }
+    #region 判断
     /**
     * 判断是否为null
     */
@@ -188,6 +189,11 @@ Class ParamterValue
     {
         return empty($this->getValue());
     }
+    
+    #endregion
+
+
+    #region 结果输出
     
     public function Get()
     {
@@ -213,13 +219,28 @@ Class ParamterValue
         return $value;
     }
     /**
-    * 格式化参数，应对修改器
-    */
-    private function getRefactorName()
+     * 输出一个int类型组成的数组
+     * @param string $sep 字符串分隔符
+     * 
+     * @return null|array
+     */
+    public function GetIntList($sep = ',') : ?array
     {
-        $str = str_replace('_', ' ', $this->ArgumentField);
-        $str = ucwords($str);
-        return str_replace(' ', '', $str);
+        if( $this->isEmpty() ){
+            return null;
+        }
+        $value = $this->Get();
+        if( $this->type()->isString() ){
+            $value = explode($sep, $this->Get());
+        }elseif($this->type()->isArray() == false){
+            return null;
+        }
+        foreach( $value as $val ){
+            if( !is_int($val) ){
+                return false;
+            }
+        }
+        return array_values($value);
     }
     
     public function __toString()
@@ -274,4 +295,17 @@ Class ParamterValue
         }
         throw new \Exception("Call to a member function {$method}() on null or not Object");
     }
+    #endregion
+    #region 辅助函数
+    
+    /**
+    * 格式化参数，应对修改器
+    */
+    private function getRefactorName()
+    {
+        $str = str_replace('_', ' ', $this->ArgumentField);
+        $str = ucwords($str);
+        return str_replace(' ', '', $str);
+    }
+    #endregion
 }
